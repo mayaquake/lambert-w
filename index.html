@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lambert W Calculator</title>
+    <meta name="theme-color" content="#1e40af">
+    <meta name="description" content="Calculate Lambert W function values">
+
+```
+<!-- PWA manifest -->
+<link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkxhbWJlcnQgVyBDYWxjdWxhdG9yIiwKICAic2hvcnRfbmFtZSI6ICJMYW1iZXJ0VyIsCiAgImRlc2NyaXB0aW9uIjogIkNhbGN1bGF0ZSBMYW1iZXJ0IFcgZnVuY3Rpb24gdmFsdWVzIiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmOWZhZmIiLAogICJ0aGVtZV9jb2xvciI6ICIjMWU0MGFmIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTVRJd0lpQm9aV2xuYUhROUlqRXlNQ0lpSUhabGNuTnBiMjQ5SWpFdU1TSWdlRzFzYm5NOUltaDBkSEE2THk5M2QzY3Vkek11YjNKbkx6SXdNREF2YzNabklqNEtJQ0E4WkdWbWN6NEtJQ0FnSUNBOGJHbHVaV0ZzUjNKaFpHbGxiblFnYVdROUluZGhkbVVpSUhneFBTSXdKU0lnZVRFOUlqQWxJaUJqTWowaU1TNHdJaUJqTWowdU5pSWdlVEU5SWpFd01DVWlMejRLSUNBOEwyUmxabk0rQ2lBZ1BHTnBjbU5zWlNCamVEMGlOakFpSUdONVBTSTJNQ0lnY2owdE5EZ2lJR1pwYkd3OUluVnliQ2dpSTNkaGRtVXBJaTgrQ2lBZ1BIUmxlSFFnZUQwaU5qQWlJSGs5SWpJNUlpQjBaWGgwTFdGdVkyaHZjajBpYldsa1pHeGxJaUJtYVd4c1BTSWpNVFUyWVRsMElpQm1iMjUwTFhkcFpXZG9kRDBpTmpBd0lpQm1iMjUwTFdaaGJXbHNlVDBpYldGdWIxTndZV05sSWo1WFBDOTBaWGgwUGdvOEwzTjJaejQ9IiwKICAgICAgInNpemVzIjogIjEyMHgxMjAiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0sCiAgImNhdGVnb3JpZXMiOiBbImVkdWNhdGlvbiIsICJ1dGlsaXRpZXMiXQp9">
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+        text-align: center;
+    }
+
+    h1 {
+        color: #1e40af;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+
+    .subtitle {
+        color: #64748b;
+        margin-bottom: 30px;
+        font-size: 1.1rem;
+    }
+
+    .input-group {
+        margin-bottom: 25px;
+    }
+
+    label {
+        display: block;
+        color: #374151;
+        font-weight: 600;
+        margin-bottom: 8px;
+        text-align: left;
+    }
+
+    input {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    button {
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+    }
+
+    button:active {
+        transform: translateY(0);
+    }
+
+    .result {
+        background: #f8fafc;
+        border-left: 4px solid #10b981;
+        padding: 20px;
+        border-radius: 12px;
+        margin-top: 20px;
+        text-align: left;
+    }
+
+    .result h3 {
+        color: #059669;
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+    }
+
+    .result-value {
+        font-family: 'Courier New', monospace;
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #1f2937;
+        background: white;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .error {
+        background: #fef2f2;
+        border-left: 4px solid #ef4444;
+        color: #dc2626;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+    }
+
+    .info {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        color: #1e40af;
+        font-size: 0.9rem;
+    }
+
+    .branch-selector {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .branch-btn {
+        flex: 1;
+        padding: 10px;
+        background: #f3f4f6;
+        border: 2px solid #e5e7eb;
+        color: #374151;
+        font-size: 0.9rem;
+    }
+
+    .branch-btn.active {
+        background: #3b82f6;
+        border-color: #3b82f6;
+        color: white;
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            padding: 25px;
+        }
+        
+        h1 {
+            font-size: 2rem;
+        }
+        
+        .branch-selector {
+            flex-direction: column;
+        }
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="container">
+        <h1>Lambert W</h1>
+        <p class="subtitle">Calculate the Lambert W function W(x)</p>
+
+```
+    <div class="input-group">
+        <label for="inputValue">Enter value (x):</label>
+        <input type="number" id="inputValue" placeholder="e.g., 1, -0.2, 2.718" step="any">
+    </div>
+
+    <div class="branch-selector">
+        <button type="button" class="branch-btn active" data-branch="0">W₀ (Principal)</button>
+        <button type="button" class="branch-btn" data-branch="-1">W₋₁ (Secondary)</button>
+    </div>
+
+    <button onclick="calculateLambertW()">Calculate W(x)</button>
+
+    <div id="result"></div>
+
+    <div class="info">
+        <strong>Lambert W Function:</strong> The inverse of f(x) = xe^x<br>
+        • W₀: Principal branch (x ≥ -1/e)<br>
+        • W₋₁: Secondary branch (-1/e ≤ x < 0)
+    </div>
+</div>
+
+<script>
+    let selectedBranch = 0;
+
+    // Service Worker registration
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZXZlbnQgPT4gewogIGNvbnNvbGUubG9nKCdTZXJ2aWNlIFdvcmtlciBpbnN0YWxsZWQnKTsKfSk7CgpzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2ZldGNoJywgZXZlbnQgPT4gewogIC8vIEJhc2ljIGZldGNoIGhhbmRsaW5nCiAgZXZlbnQucmVzcG9uZFdpdGgoZmV0Y2goZXZlbnQucmVxdWVzdCkpOwp9KTs=')
+            .then(registration => console.log('SW registered'))
+            .catch(error => console.log('SW registration failed'));
+    }
+
+    // Branch selection
+    document.querySelectorAll('.branch-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.branch-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            selectedBranch = parseInt(this.dataset.branch);
+        });
+    });
+
+    // Enter key support
+    document.getElementById('inputValue').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            calculateLambertW();
+        }
+    });
+
+    function calculateLambertW() {
+        const input = document.getElementById('inputValue');
+        const resultDiv = document.getElementById('result');
+        const x = parseFloat(input.value);
+
+        if (isNaN(x)) {
+            resultDiv.innerHTML = '<div class="error">Please enter a valid number</div>';
+            return;
+        }
+
+        try {
+            const result = lambertW(x, selectedBranch);
+            const branchName = selectedBranch === 0 ? 'W₀' : 'W₋₁';
+            
+            resultDiv.innerHTML = `
+                <div class="result">
+                    <h3>${branchName}(${x}) = </h3>
+                    <div class="result-value">${result}</div>
+                </div>
+            `;
+        } catch (error) {
+            resultDiv.innerHTML = `<div class="error">${error.message}</div>`;
+        }
+    }
+
+    function lambertW(x, branch = 0) {
+        const EXP_NEG1 = -1 / Math.E; // ≈ -0.36787944117144233
+
+        // Input validation
+        if (branch === 0 && x < EXP_NEG1) {
+            throw new Error(`W₀ undefined for x < -1/e (${EXP_NEG1.toFixed(8)})`);
+        }
+        if (branch === -1 && (x < EXP_NEG1 || x >= 0)) {
+            throw new Error(`W₋₁ only defined for -1/e ≤ x < 0`);
+        }
+
+        // Special cases
+        if (x === 0) return branch === 0 ? 0 : -Infinity;
+        if (x === EXP_NEG1) return -1;
+        if (branch === 0 && x === Infinity) return Infinity;
+
+        // Initial guess
+        let w;
+        if (branch === 0) {
+            if (x < 2) {
+                w = x < 0.14546954290661823 ? x : Math.log(x);
+            } else {
+                w = Math.log(x) - Math.log(Math.log(x));
+            }
+        } else { // branch === -1
+            if (x < -0.1) {
+                const p = Math.sqrt(2 * (Math.E * x + 1));
+                w = -1 - p + (2/3) * p;
+            } else {
+                w = Math.log(-x) - Math.log(-Math.log(-x));
+            }
+        }
+
+        // Halley's method iteration
+        for (let i = 0; i < 50; i++) {
+            const ew = Math.exp(w);
+            const wew = w * ew;
+            const f = wew - x;
+            
+            if (Math.abs(f) < 1e-15) break;
+            
+            const df = ew * (w + 1);
+            const d2f = ew * (w + 2);
+            
+            // Halley's update
+            const delta = f / (df - (f * d2f) / (2 * df));
+            w -= delta;
+            
+            if (Math.abs(delta) < 1e-15) break;
+        }
+
+        return parseFloat(w.toPrecision(15));
+    }
+
+    // Install prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Show install hint
+        const installHint = document.createElement('div');
+        installHint.innerHTML = `
+            <div style="position: fixed; bottom: 20px; right: 20px; background: #1e40af; color: white; padding: 15px; border-radius: 10px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 1000;" onclick="installApp()">
+                📱 Install App
+            </div>
+        `;
+        document.body.appendChild(installHint);
+    });
+
+    function installApp() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((result) => {
+                deferredPrompt = null;
+                document.querySelector('[onclick="installApp()"]')?.remove();
+            });
+        }
+    }
+</script>
+```
+
+</body>
+</html>
