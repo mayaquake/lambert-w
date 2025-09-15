@@ -1,2 +1,2 @@
 # lambert-w
-Lambert W Calculatorzz
+Lambert W Calculator
