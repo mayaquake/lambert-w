@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lambert PWA – Mobilvänlig Knappsats</title>
+<title>Lambert PWA Keypad</title>
 <link rel="manifest" href="manifest.json">
 <style>
   body {
@@ -13,116 +13,128 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background-color: #f2f2f2;
+    background-color: #fff;
   }
+
   #display {
     width: 100%;
-    max-width: 360px;
-    height: 70px;
-    margin-bottom: 15px;
-    font-size: 2rem;
+    max-width: 300px;
+    height: 50px;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
     text-align: right;
     padding: 10px;
-    border: 2px solid #007acc;
-    border-radius: 8px;
-    background-color: #fff;
-    pointer-events: none;
+    border: 1px solid #ccc;
+    background-color: #f5f5f5;
+    color: #000;
   }
+
   .keypad {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    max-width: 360px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 320px;
     width: 100%;
   }
+
   button {
-    padding: 25px;
-    font-size: 1.5rem;
+    padding: 20px;
+    font-size: 1.2rem;
     cursor: pointer;
-    border-radius: 8px;
     border: none;
-    background-color: #007acc;
-    color: white;
-    transition: background-color 0.2s;
+    background-color: #333; /* dark gray buttons */
+    color: #fff;
+    border-radius: 5px;
   }
+
   button:hover {
-    background-color: #005fa3;
+    opacity: 0.8;
   }
-  button:active {
-    background-color: #004f87;
+
+  .btn-red {
+    background-color: #c00; /* red C button */
   }
-  .wide {
-    grid-column: span 3;
-    background-color: #ff4d4d;
+
+  .btn-gray {
+    background-color: #555; /* darker gray */
   }
-  .equals {
-    background-color: #00b300;
-  }
-  .equals:hover { background-color: #009900; }
-  .equals:active { background-color: #007700; }
 </style>
 </head>
 <body>
 
-<div id="display"></div>
+<input type="text" id="display" readonly placeholder="0">
 
 <div class="keypad">
+  <!-- Row 1 -->
   <button onclick="press('1')">1</button>
   <button onclick="press('2')">2</button>
   <button onclick="press('3')">3</button>
+  <button class="btn-red" onclick="clearDisplay()">C</button>
+
+  <!-- Row 2 -->
   <button onclick="press('4')">4</button>
   <button onclick="press('5')">5</button>
   <button onclick="press('6')">6</button>
+  <button class="btn-gray" onclick="toggleSign()">+/-</button>
+
+  <!-- Row 3 -->
   <button onclick="press('7')">7</button>
   <button onclick="press('8')">8</button>
   <button onclick="press('9')">9</button>
+  <button class="btn-gray" onclick="calculate()">=</button>
+
+  <!-- Row 4 -->
+  <button></button> <!-- empty placeholder -->
   <button onclick="press('0')">0</button>
-  <button class="wide" onclick="clearDisplay()">C</button>
-  <button class="equals" onclick="calculate()">=</button>
+  <button onclick="press('.')">.</button>
+  <button></button> <!-- empty placeholder -->
 </div>
 
 <script>
-let inputValue = '';
+  let inputValue = '';
 
-function press(num) {
-  inputValue += num;
-  document.getElementById('display').textContent = inputValue;
-}
-
-function clearDisplay() {
-  inputValue = '';
-  document.getElementById('display').textContent = '';
-}
-
-// Numerisk Lambert W approximation (Principal branch W0)
-function lambertW(z) {
-  if (z === 0) return 0;
-  let w = Math.log(z + 1); // initial guess
-  for (let i = 0; i < 10; i++) {
-    let eW = Math.exp(w);
-    let wNext = w - (w * eW - z) / (eW * (w + 1) - ((w + 2) * (w * eW - z)) / (2 * (w + 1)));
-    if (Math.abs(wNext - w) < 1e-10) break;
-    w = wNext;
+  function press(char) {
+    if (char === '.' && inputValue.includes('.')) return; // only one decimal
+    inputValue += char;
+    document.getElementById('display').value = inputValue;
   }
-  return w;
-}
 
-function calculate() {
-  const x = parseFloat(inputValue);
-  if (!isNaN(x)) {
-    const result = lambertW(x);
-    document.getElementById('display').textContent = result;
-    inputValue = result.toString();
-  } else {
-    document.getElementById('display').textContent = 'Fel';
+  function clearDisplay() {
     inputValue = '';
+    document.getElementById('display').value = '';
   }
-}
 
-// PWA service worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js');
-}
+  function toggleSign() {
+    if (!inputValue) return;
+    if (inputValue.startsWith('-')) {
+      inputValue = inputValue.slice(1);
+    } else {
+      inputValue = '-' + inputValue;
+    }
+    document.getElementById('display').value = inputValue;
+  }
+
+  function calculate() {
+    const x = parseFloat(inputValue);
+    if (isNaN(x)) {
+      document.getElementById('display').value = 'Error';
+      inputValue = '';
+      return;
+    }
+    const result = lambertExample(x);
+    document.getElementById('display').value = result;
+    inputValue = result.toString();
+  }
+
+  function lambertExample(x) {
+    // placeholder for real Lambert W calculation
+    if (x < -0.36787944117) return 'Error'; // W(x) undefined for x < -1/e
+    return Math.log(x + 1); // replace with real Lambert W
+  }
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
 </script>
 
 </body>
