@@ -5,7 +5,7 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#007BFF",
-  "description": "Compute Lambert W function",
+  "description": "Compute Lambert W function including W0 and W-1 branches, rendered with LaTeX",
   "icons": [
     {
       "src": "icon.png",
