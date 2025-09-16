@@ -114,38 +114,23 @@
     document.getElementById('display').value = inputValue;
   }
 
-function calculate() {
-  const x = parseFloat(inputValue);
-  if (isNaN(x)) {
-    document.getElementById('display').value = 'Error';
-    inputValue = '';
-    return;
-  }
-  const result = lambertW(x);
-  if (isNaN(result)) {
-    document.getElementById('display').value = 'NaN';
-  } else {
+  function calculate() {
+    const x = parseFloat(inputValue);
+    if (isNaN(x)) {
+      document.getElementById('display').value = 'Error';
+      inputValue = '';
+      return;
+    }
+    const result = lambertExample(x);
     document.getElementById('display').value = result;
+    inputValue = result.toString();
   }
-  inputValue = result.toString();
-}
 
-  function lambertW(x) {
-  if (x === 0) return 0;
-  if (x < -Math.E ** -1) return NaN; // Lambert W är inte definierad för x < -1/e
-
-  let w = x;
-  let prevW;
-  const tolerance = 1e-10;
-  const maxIterations = 100;
-
-  do {
-    prevW = w;
-    w = w - (w * Math.exp(w) - x) / (Math.exp(w) + w * Math.exp(w));
-  } while (Math.abs(w - prevW) > tolerance && --maxIterations > 0);
-
-  return w;
-}
+  function lambertExample(x) {
+    // placeholder for real Lambert W calculation
+    if (x < -0.36787944117) return 'Error'; // W(x) undefined for x < -1/e
+    return Math.log(x + 1); // replace with real Lambert W
+  }
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js');
