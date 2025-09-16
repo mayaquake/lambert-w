@@ -1,74 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lambert W PWA</title>
-  <link rel="manifest" href="manifest.json">
-  <style>
-    body { font-family: Arial, sans-serif; padding: 2em; }
-    input, button { font-size: 1em; margin: 0.5em 0; }
-    .result { margin-top: 1em; font-size: 1.2em; }
-  </style>
-  <!-- Load MathJax -->
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lambert PWA – Mobilvänlig Knappsats</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: #f2f2f2;
+  }
+  #display {
+    width: 100%;
+    max-width: 360px;
+    height: 70px;
+    margin-bottom: 15px;
+    font-size: 2rem;
+    text-align: right;
+    padding: 10px;
+    border: 2px solid #007acc;
+    border-radius: 8px;
+    background-color: #fff;
+    pointer-events: none;
+  }
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    max-width: 360px;
+    width: 100%;
+  }
+  button {
+    padding: 25px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    border-radius: 8px;
+    border: none;
+    background-color: #007acc;
+    color: white;
+    transition: background-color 0.2s;
+  }
+  button:hover {
+    background-color: #005fa3;
+  }
+  button:active {
+    background-color: #004f87;
+  }
+  .wide {
+    grid-column: span 3;
+    background-color: #ff4d4d;
+  }
+  .equals {
+    background-color: #00b300;
+  }
+  .equals:hover { background-color: #009900; }
+  .equals:active { background-color: #007700; }
+</style>
 </head>
 <body>
-  <h1>Lambert W Calculator</h1>
-  <input type="number" id="xInput" placeholder="Enter x" step="any">
-  <button id="calcBtn">Compute W(x)</button>
-  <div class="result" id="result"></div>
 
-  <script>
-    // Lambert W approximation for both W0 and W-1 branches
-    function lambertW(x, branch = 0) {
-      if (x === 0) return 0;
-      if (x === -1/Math.E) return -1;
-      if (x < -1/Math.E) return NaN;
+<div id="display"></div>
 
-      let w;
-      if (branch === 0) {
-        w = Math.log1p(x);
-      } else {
-        w = Math.log(-x);
-      }
+<div class="keypad">
+  <button onclick="press('1')">1</button>
+  <button onclick="press('2')">2</button>
+  <button onclick="press('3')">3</button>
+  <button onclick="press('4')">4</button>
+  <button onclick="press('5')">5</button>
+  <button onclick="press('6')">6</button>
+  <button onclick="press('7')">7</button>
+  <button onclick="press('8')">8</button>
+  <button onclick="press('9')">9</button>
+  <button onclick="press('0')">0</button>
+  <button class="wide" onclick="clearDisplay()">C</button>
+  <button class="equals" onclick="calculate()">=</button>
+</div>
 
-      for (let i = 0; i < 50; i++) {
-        let e = Math.exp(w);
-        let f = w * e - x;
-        let denom = e * (w + 1) - ((w + 2) * f) / (2 * (w + 1));
-        let wNext = w - f / denom;
-        if (Math.abs(wNext - w) < 1e-12) return wNext;
-        w = wNext;
-      }
-      return w;
-    }
+<script>
+let inputValue = '';
 
-    document.getElementById('calcBtn').addEventListener('click', () => {
-      const x = parseFloat(document.getElementById('xInput').value);
-      let output = "";
+function press(num) {
+  inputValue += num;
+  document.getElementById('display').textContent = inputValue;
+}
 
-      if (isNaN(x)) {
-        output = "Please enter a valid number.";
-      } else if (x >= 0) {
-        output = `$$W_0(${x}) \\approx ${lambertW(x, 0).toPrecision(12)}$$`;
-      } else if (x >= -1/Math.E && x < 0) {
-        output = `$$W_0(${x}) \\approx ${lambertW(x, 0).toPrecision(12)}$$<br>
-                  $$W_{-1}(${x}) \\approx ${lambertW(x, -1).toPrecision(12)}$$`;
-      } else {
-        output = `No real Lambert W value for $${x}$.`;
-      }
+function clearDisplay() {
+  inputValue = '';
+  document.getElementById('display').textContent = '';
+}
 
-      document.getElementById('result').innerHTML = output;
-      MathJax.typesetPromise(); // render LaTeX
-    });
+// Numerisk Lambert W approximation (Principal branch W0)
+function lambertW(z) {
+  if (z === 0) return 0;
+  let w = Math.log(z + 1); // initial guess
+  for (let i = 0; i < 10; i++) {
+    let eW = Math.exp(w);
+    let wNext = w - (w * eW - z) / (eW * (w + 1) - ((w + 2) * (w * eW - z)) / (2 * (w + 1)));
+    if (Math.abs(wNext - w) < 1e-10) break;
+    w = wNext;
+  }
+  return w;
+}
 
-    // Register Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('Service Worker registered'))
-        .catch(err => console.log('Service Worker registration failed:', err));
-    }
-  </script>
+function calculate() {
+  const x = parseFloat(inputValue);
+  if (!isNaN(x)) {
+    const result = lambertW(x);
+    document.getElementById('display').textContent = result;
+    inputValue = result.toString();
+  } else {
+    document.getElementById('display').textContent = 'Fel';
+    inputValue = '';
+  }
+}
+
+// PWA service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
+</script>
+
 </body>
 </html>
