@@ -1,47 +1,14 @@
-const CACHE_NAME = "hello-pwa-dynamic-v1";
+const cacheName = 'lambertw-pwa-v1';
+const assetsToCache = ['/', 'index.html', 'manifest.json'];
 
-// Install – inget särskilt behövs, vi fyller på cache vid fetch
-self.addEventListener("install", event => {
-  self.skipWaiting();
-});
-
-// Activate – rensa gamla cacher
-self.addEventListener("activate", event => {
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.map(key => (key !== CACHE_NAME ? caches.delete(key) : null))
-      )
-    )
+    caches.open(cacheName).then(cache => cache.addAll(assetsToCache))
   );
-  self.clients.claim();
 });
 
-// Fetch – cache first, annars nätet
-self.addEventListener("fetch", event => {
+self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(cachedResponse => {
-      if (cachedResponse) {
-        // Returnera från cache om den finns
-        return cachedResponse;
-      }
-      // Annars hämta från nätet och lägg i cache
-      return fetch(event.request).then(networkResponse => {
-        // Endast cacha giltiga svar (status 200, typ basic = samma origin)
-        if (
-          networkResponse &&
-          networkResponse.status === 200 &&
-          networkResponse.type === "basic"
-        ) {
-          const clonedResponse = networkResponse.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, clonedResponse);
-          });
-        }
-        return networkResponse;
-      }).catch(() => {
-        // Här kan du lägga en offline-fallback-sida om du vill
-      });
-    })
+    caches.match(event.request).then(response => response || fetch(event.request))
   );
 });
