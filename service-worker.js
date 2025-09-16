@@ -1,4 +1,4 @@
-const cacheName = 'lambertw-pwa-v1';
+const cacheName = 'lambertw-pwa-v3';
 const assetsToCache = ['/', 'index.html', 'manifest.json'];
 
 self.addEventListener('install', event => {
