@@ -8,23 +8,37 @@
   <style>
     body { font-family: Arial, sans-serif; padding: 2em; }
     input, button { font-size: 1em; margin: 0.5em 0; }
+    .result { margin-top: 1em; font-size: 1.2em; }
   </style>
+  <!-- Load MathJax -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
   <h1>Lambert W Calculator</h1>
   <input type="number" id="xInput" placeholder="Enter x" step="any">
   <button id="calcBtn">Compute W(x)</button>
-  <p id="result"></p>
+  <div class="result" id="result"></div>
 
   <script>
-    // Lambert W function approximation using Newton-Raphson
-    function lambertW(x) {
+    // Lambert W approximation for both W0 and W-1 branches
+    function lambertW(x, branch = 0) {
       if (x === 0) return 0;
-      let w = Math.log(1 + x); // initial guess
-      for (let i = 0; i < 20; i++) {
+      if (x === -1/Math.E) return -1;
+      if (x < -1/Math.E) return NaN;
+
+      let w;
+      if (branch === 0) {
+        w = Math.log1p(x);
+      } else {
+        w = Math.log(-x);
+      }
+
+      for (let i = 0; i < 50; i++) {
         let e = Math.exp(w);
-        let wNext = w - (w * e - x) / (e * (w + 1) - ((w + 2) * (w * e - x)) / (2 * (w + 1)));
-        if (Math.abs(wNext - w) < 1e-10) break;
+        let f = w * e - x;
+        let denom = e * (w + 1) - ((w + 2) * f) / (2 * (w + 1));
+        let wNext = w - f / denom;
+        if (Math.abs(wNext - w) < 1e-12) return wNext;
         w = wNext;
       }
       return w;
@@ -32,8 +46,21 @@
 
     document.getElementById('calcBtn').addEventListener('click', () => {
       const x = parseFloat(document.getElementById('xInput').value);
-      const result = lambertW(x);
-      document.getElementById('result').textContent = `W(${x}) ≈ ${result}`;
+      let output = "";
+
+      if (isNaN(x)) {
+        output = "Please enter a valid number.";
+      } else if (x >= 0) {
+        output = `$$W_0(${x}) \\approx ${lambertW(x, 0).toPrecision(12)}$$`;
+      } else if (x >= -1/Math.E && x < 0) {
+        output = `$$W_0(${x}) \\approx ${lambertW(x, 0).toPrecision(12)}$$<br>
+                  $$W_{-1}(${x}) \\approx ${lambertW(x, -1).toPrecision(12)}$$`;
+      } else {
+        output = `No real Lambert W value for $${x}$.`;
+      }
+
+      document.getElementById('result').innerHTML = output;
+      MathJax.typesetPromise(); // render LaTeX
     });
 
     // Register Service Worker
